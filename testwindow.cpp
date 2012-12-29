@@ -8,6 +8,7 @@ TestWindow::TestWindow(QWidget *parent) :
     ui(new Ui::TestWindow)
 {
     ui->setupUi(this);
+    connector = NULL;
 }
 
 void TestWindow::setUpInterface() {
@@ -15,7 +16,9 @@ void TestWindow::setUpInterface() {
     QTextEdit *textEdit = new QTextEdit();
     QPushButton *quitButton = new QPushButton("&Quit");
 
-    QObject::connect(quitButton, SIGNAL(clicked()), qApp, SLOT(quit()));
+    //QObject::connect(quitButton, SIGNAL(clicked()), qApp, SLOT(quit()));
+
+    QObject::connect(quitButton, SIGNAL(clicked()), this, SLOT(buttonReadAllPressed()));
 
     QVBoxLayout *layout = new QVBoxLayout();
     layout->addWidget(textEdit);
@@ -27,9 +30,9 @@ void TestWindow::setUpInterface() {
 
 void TestWindow::buttonReadAllPressed() {
     if (connector == NULL) {
-        connector = new freeLib::LibConnector(new QString(""),this);
+        connector = new freeLib::LibConnector(new QString("http://shrouded-beach-6392.herokuapp.com/"),this);
     }
-    connector->fetchFrom(new QString("all.json"));
+    connector->fetchFrom(new QString("books/add"));
 }
 
 TestWindow::~TestWindow()

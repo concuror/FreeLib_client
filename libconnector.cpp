@@ -19,9 +19,24 @@ LibConnector::LibConnector (QString *BaseUrl, QObject *parent) :
 
 void LibConnector::fetchFrom(QString *page) {
     QUrl url;
-    url.setUrl(baseUrl->append(page));
+    url.setUrl(*baseUrl + *page);
+    qDebug() << url.toString();
     QNetworkRequest request(url);
-    networkManager->get(request);
+    if (page->contains("books/list")) {
+        networkManager->get(request);
+    }
+    else if (page->contains("books/add")) {
+        QMap<QString,QVariant> map;
+        map.insert("author","Andrii Titov");
+        QByteArray arr("This is interesting book 2012");
+        map.insert("book",arr);
+//        map.insert("book","This is interesting book");
+        QVariant tmp(map);
+        QJsonDocument doc = QJsonDocument::fromVariant(tmp);
+        qDebug() << "Variant:" << tmp;
+        qDebug() << "Binary:" << doc.toJson();
+        networkManager->put(request,doc.toJson());
+    }
     delete page;
 }
 
@@ -31,14 +46,20 @@ void LibConnector::requestFinishedWithReply(QNetworkReply *reply) {
     }
     else {
         QString path = reply->url().path();
-        if (path.contains("",Qt::CaseInsensitive)) {
+        if (path.contains("books/list",Qt::CaseInsensitive)) {
             QJsonParseError *error = new QJsonParseError();
-            QJsonDocument doc = QJsonDocument::fromJson(reply->readAll(),error);
+            QByteArray arr = reply->readAll();
+            qDebug() << arr;
+            QJsonDocument doc = QJsonDocument::fromJson(arr,error);
             if (error->error > 0) {
                 qDebug() << error->errorString();
                 return;
             }
-            qDebug() << doc.toVariant().toString();
+            qDebug() << doc.toVariant();
+        }
+        else if (path.contains("books/add",Qt::CaseInsensitive)) {
+            QByteArray arr = reply->readAll();
+            qDebug() << arr;
         }
     }
 }
