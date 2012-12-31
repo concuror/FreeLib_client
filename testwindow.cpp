@@ -18,8 +18,6 @@
 
 #include "testwindow.h"
 #include "ui_testwindow.h"
-#include <QtGui>
-#include <QtWidgets>
 
 TestWindow::TestWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -31,7 +29,7 @@ TestWindow::TestWindow(QWidget *parent) :
 
 void TestWindow::setUpInterface() {
 
-    QTextEdit *textEdit = new QTextEdit();
+    textEdit = new QTextEdit();
     QPushButton *quitButton = new QPushButton("&Quit");
 
     QPushButton *addButton = new QPushButton("&Add");
@@ -66,25 +64,34 @@ void TestWindow::setUpInterface() {
 
 }
 
+void TestWindow::setUpConnector() {
+    connector = new freeLib::LibConnector(new QString("http://bookserver.herokuapp.com/"),this);
+    QObject::connect(connector,SIGNAL(replyArrived(QString)),this,SLOT(responseArrived(QString)));
+}
+
 void TestWindow::buttonReadAllPressed() {
     if (connector == NULL) {
-        connector = new freeLib::LibConnector(new QString("http://bookserver.herokuapp.com/"),this);
+        this->setUpConnector();
     }
     connector->fetchFrom(new QString("books/list"));
 }
 
 void TestWindow::buttonGetPressed() {
     if (connector == NULL) {
-        connector = new freeLib::LibConnector(new QString("http://bookserver.herokuapp.com/"),this);
+        this->setUpConnector();
     }
     connector->fetchFrom(new QString("books/get/1"));
 }
 
 void TestWindow::buttonAddPressed() {
     if (connector == NULL) {
-        connector = new freeLib::LibConnector(new QString("http://bookserver.herokuapp.com/"),this);
+        this->setUpConnector();
     }
     connector->fetchFrom(new QString("books/add"));
+}
+
+void TestWindow::responseArrived(const QString& resp) {
+    textEdit->setText(resp);
 }
 
 TestWindow::~TestWindow()

@@ -75,7 +75,9 @@ void LibConnector::requestFinishedWithReply(QNetworkReply *reply) {
         QString path = reply->url().path();
         QJsonParseError *parseError = new QJsonParseError();
         QByteArray arr = reply->readAll();
+        QString reply(arr);
         //qDebug() << arr;
+        emit replyArrived(reply);
         if (path.contains("books/list",Qt::CaseInsensitive)) {
             QJsonDocument doc = QJsonDocument::fromJson(arr,parseError);
             if (parseError->error > 0) {

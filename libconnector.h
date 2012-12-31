@@ -44,7 +44,7 @@ public:
 
 signals:
 
-
+    void replyArrived(const QString& reply);
 
 public slots:
 

@@ -20,6 +20,8 @@
 #define TESTWINDOW_H
 
 #include <QMainWindow>
+#include <QtGui>
+#include <QtWidgets>
 #include "libconnector.h"
 
 class LibConnector;
@@ -39,6 +41,8 @@ public slots:
     void buttonGetPressed();
 
     void buttonAddPressed();
+
+    void responseArrived(const QString& resp);
     
 public:
     void setUpInterface();
@@ -47,8 +51,13 @@ public:
     ~TestWindow();
     
 private:
+
     Ui::TestWindow *ui;
     freeLib::LibConnector *connector;
+    QTextEdit *textEdit;
+
+    void setUpConnector();
+
 };
 
 #endif // TESTWINDOW_H
