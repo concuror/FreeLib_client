@@ -34,21 +34,55 @@ void TestWindow::setUpInterface() {
     QTextEdit *textEdit = new QTextEdit();
     QPushButton *quitButton = new QPushButton("&Quit");
 
-    //QObject::connect(quitButton, SIGNAL(clicked()), qApp, SLOT(quit()));
+    QPushButton *addButton = new QPushButton("&Add");
 
-    QObject::connect(quitButton, SIGNAL(clicked()), this, SLOT(buttonReadAllPressed()));
+    QPushButton *getButton = new QPushButton("&Get");
+
+    QPushButton *listButton = new QPushButton("&List");
+
+    QObject::connect(quitButton, SIGNAL(clicked()), qApp, SLOT(quit()));
+
+    QObject::connect(listButton, SIGNAL(clicked()), this, SLOT(buttonReadAllPressed()));
+
+    QObject::connect(getButton, SIGNAL(clicked()), this, SLOT(buttonGetPressed()));
+
+    QObject::connect(addButton, SIGNAL(clicked()), this, SLOT(buttonAddPressed()));
+
+    QHBoxLayout *mainLayout = new QHBoxLayout();
 
     QVBoxLayout *layout = new QVBoxLayout();
     layout->addWidget(textEdit);
     layout->addWidget(quitButton);
 
-    this->centralWidget()->setLayout(layout);
+    QVBoxLayout *buttLayout = new QVBoxLayout();
+    buttLayout->addWidget(addButton);
+    buttLayout->addWidget(getButton);
+    buttLayout->addWidget(listButton);
+
+    mainLayout->addLayout(layout);
+    mainLayout->addLayout(buttLayout);
+
+    this->centralWidget()->setLayout(mainLayout);
 
 }
 
 void TestWindow::buttonReadAllPressed() {
     if (connector == NULL) {
-        connector = new freeLib::LibConnector(new QString("http://shrouded-beach-6392.herokuapp.com/"),this);
+        connector = new freeLib::LibConnector(new QString("http://bookserver.herokuapp.com/"),this);
+    }
+    connector->fetchFrom(new QString("books/list"));
+}
+
+void TestWindow::buttonGetPressed() {
+    if (connector == NULL) {
+        connector = new freeLib::LibConnector(new QString("http://bookserver.herokuapp.com/"),this);
+    }
+    connector->fetchFrom(new QString("books/get/1"));
+}
+
+void TestWindow::buttonAddPressed() {
+    if (connector == NULL) {
+        connector = new freeLib::LibConnector(new QString("http://bookserver.herokuapp.com/"),this);
     }
     connector->fetchFrom(new QString("books/add"));
 }

@@ -45,7 +45,9 @@ void LibConnector::fetchFrom(QString *page) {
     }
     else if (page->contains("books/add")) {
         QMap<QString,QVariant> map;
-        map.insert("author","Andrii Titov");
+        map.insert("author","Den Abnett");
+        map.insert("name","Chuma");
+        map.insert("extension",".mobi");
         QFile book("/Users/concuror/Downloads/Abnett_Chuma_183366.mobi");
         if (!book.open(QIODevice::ReadOnly)) {
             qDebug() << book.errorString();
@@ -59,6 +61,9 @@ void LibConnector::fetchFrom(QString *page) {
         qDebug() << "Binary:" << doc.toJson();
         networkManager->put(request,doc.toJson());
     }
+    else if (page->contains("books/get")) {
+        networkManager->get(request);
+    }
     delete page;
 }
 
@@ -68,20 +73,41 @@ void LibConnector::requestFinishedWithReply(QNetworkReply *reply) {
     }
     else {
         QString path = reply->url().path();
+        QJsonParseError *parseError = new QJsonParseError();
+        QByteArray arr = reply->readAll();
+        //qDebug() << arr;
         if (path.contains("books/list",Qt::CaseInsensitive)) {
-            QJsonParseError *error = new QJsonParseError();
-            QByteArray arr = reply->readAll();
-            qDebug() << arr;
-            QJsonDocument doc = QJsonDocument::fromJson(arr,error);
-            if (error->error > 0) {
-                qDebug() << error->errorString();
+            QJsonDocument doc = QJsonDocument::fromJson(arr,parseError);
+            if (parseError->error > 0) {
+                qDebug() << parseError->errorString();
                 return;
             }
             qDebug() << doc.toVariant();
         }
         else if (path.contains("books/add",Qt::CaseInsensitive)) {
-            QByteArray arr = reply->readAll();
             qDebug() << arr;
+        }
+        else if (path.contains("books/get",Qt::CaseInsensitive)) {
+            QJsonDocument doc = QJsonDocument::fromJson(arr,parseError);
+            if (parseError->error > 0) {
+                qDebug() << parseError->errorString();
+                return;
+            }
+            QVariantMap map = doc.toVariant().toMap();
+            qDebug() << map;
+
+            QString filename = map.value("author").toString();
+            filename.append(map.value("name").toString());
+            filename.append(map.value("extension").toString());
+            filename.prepend("/Users/concuror/Downloads/");
+
+            QFile book(filename);
+            if (!book.open(QIODevice::WriteOnly)) {
+                qDebug() << book.errorString();
+                return;
+            }
+            book.write(map.value("book").toByteArray());
+            book.close();
         }
     }
 }

@@ -35,6 +35,10 @@ class TestWindow : public QMainWindow
 public slots:
 
     void buttonReadAllPressed();
+
+    void buttonGetPressed();
+
+    void buttonAddPressed();
     
 public:
     void setUpInterface();
