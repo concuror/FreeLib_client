@@ -24,4 +24,5 @@ FORMS    += testwindow.ui
 LIBS += -ljson
 
 OTHER_FILES += \
-    README.md
+    README.md \
+    LICENSE.txt
