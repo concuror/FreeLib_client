@@ -28,12 +28,16 @@ void LibConnector::fetchFrom(QString *page) {
     else if (page->contains("books/add")) {
         QMap<QString,QVariant> map;
         map.insert("author","Andrii Titov");
-        QByteArray arr("This is interesting book 2012");
-        map.insert("book",arr);
-//        map.insert("book","This is interesting book");
+        QFile book("/Users/concuror/Downloads/Abnett_Chuma_183366.mobi");
+        if (!book.open(QIODevice::ReadOnly)) {
+            qDebug() << book.errorString();
+            return;
+        }
+        QByteArray arr = book.readAll();
+        book.close();
+        map.insert("book",arr.toBase64());
         QVariant tmp(map);
         QJsonDocument doc = QJsonDocument::fromVariant(tmp);
-        qDebug() << "Variant:" << tmp;
         qDebug() << "Binary:" << doc.toJson();
         networkManager->put(request,doc.toJson());
     }
