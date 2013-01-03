@@ -1,0 +1,107 @@
+//    Copyright(c) 2012 Andrii Titov
+//
+//    This file is part of FreeLib.
+//
+//    FreeLib is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    FreeLib is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with FreeLib.  If not, see <http://www.gnu.org/licenses/>.
+
+#include "book.h"
+#include <QtCore>
+
+using namespace freeLib;
+
+Book::Book(QObject *parent) :
+    QObject(parent)
+{
+    _name = NULL;
+    _author = NULL;
+    _extension = NULL;
+    _added = NULL;
+    _id = 0;
+}
+
+Book::Book(const QVariantMap& data, QObject *parent):
+    QObject(parent)
+{
+    _name = new QString(data.value("name").toString());
+    _author = new QString(data.value("author").toString());
+    _extension = new QString(data.value("extension").toString());
+    _id = data.value("id").toInt();
+    _added = new QDateTime(data.value("added_at").toDateTime());
+}
+
+Book::Book(const Book& other):
+    QObject(other.parent())
+{
+    _name = NULL;
+    _author = NULL;
+    _extension = NULL;
+    _added = NULL;
+    _id = 0;
+    *this = other;
+}
+
+QString *Book::name() const {
+    return _name;
+}
+
+QString *Book::author() const {
+    return _author;
+}
+
+QString *Book::extension() const {
+    return _extension;
+}
+
+const int Book::id() const {
+    return _id;
+}
+
+QDateTime *Book::addedAt() const {
+    return _added;
+}
+
+QString Book::filename() const {
+    QString filename(*_author);
+    filename.append("_");
+    filename.append(*_name);
+    filename.append(*_extension);
+    filename.replace(" ","_");
+    return filename;
+}
+
+bool Book::operator ==(const Book& right) {
+    return right.id() == _id;
+}
+
+Book &Book::operator =(const Book& right) {
+    if (this != &right) {
+        delete _name;
+        delete _author;
+        delete _extension;
+        delete _added;
+        _name = new QString(*right.name());
+        _author = new QString(*right.author());
+        _extension = new QString(*right.extension());
+        _id = right.id();
+        _added = new QDateTime(*right.addedAt());
+    }
+    return *this;
+}
+
+Book::~Book() {
+    delete _name;
+    delete _author;
+    delete _extension;
+    delete _added;
+}

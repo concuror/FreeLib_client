@@ -13,11 +13,17 @@
 //    GNU General Public License for more details.
 
 //    You should have received a copy of the GNU General Public License
-//    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+//    along with FreeLib.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #include "testwindow.h"
+#include "book.h"
 #include "ui_testwindow.h"
+#include "libconnector.h"
+#include "librarymanager.h"
+#include "book.h"
+
+using namespace freeLib;
 
 TestWindow::TestWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -30,6 +36,14 @@ TestWindow::TestWindow(QWidget *parent) :
 void TestWindow::setUpInterface() {
 
     textEdit = new QTextEdit();
+    textEdit->setReadOnly(true);
+
+    localBooksTable = new QTableWidget(0, 3);
+
+    QStringList headers;
+    headers << "name" << "author" << "added";
+    localBooksTable->setHorizontalHeaderLabels(headers);
+
     QPushButton *quitButton = new QPushButton("&Quit");
 
     QPushButton *addButton = new QPushButton("&Add");
@@ -49,6 +63,7 @@ void TestWindow::setUpInterface() {
     QHBoxLayout *mainLayout = new QHBoxLayout();
 
     QVBoxLayout *layout = new QVBoxLayout();
+    layout->addWidget(localBooksTable);
     layout->addWidget(textEdit);
     layout->addWidget(quitButton);
 
@@ -66,32 +81,47 @@ void TestWindow::setUpInterface() {
 
 void TestWindow::setUpConnector() {
     connector = new freeLib::LibConnector(new QString("http://bookserver.herokuapp.com/"),this);
-    QObject::connect(connector,SIGNAL(replyArrived(QString)),this,SLOT(responseArrived(QString)));
+    QObject::connect(connector,SIGNAL(replyArrived(QString,QString)),this,SLOT(responseArrived(QString,QString)));
 }
 
 void TestWindow::buttonReadAllPressed() {
     if (connector == NULL) {
         this->setUpConnector();
     }
-    connector->fetchFrom(new QString("books/list"));
+    connector->fetchFrom( "books/list" );
 }
 
 void TestWindow::buttonGetPressed() {
     if (connector == NULL) {
         this->setUpConnector();
     }
-    connector->fetchFrom(new QString("books/get/1"));
+    connector->fetchFrom( "books/get/1" );
 }
 
 void TestWindow::buttonAddPressed() {
     if (connector == NULL) {
         this->setUpConnector();
     }
-    connector->fetchFrom(new QString("books/add"));
+    connector->fetchFrom( "books/add" );
 }
 
-void TestWindow::responseArrived(const QString& resp) {
+void TestWindow::responseArrived(const QString& path, const QString &resp) {
     textEdit->setText(resp);
+    if (path.contains("books/list")) {
+        QList<Book> *books = LibraryManager::instance()->getBooks();
+        int row = localBooksTable->rowCount();
+        QList<Book>::const_iterator booksIter;
+        for (booksIter = books->constBegin(); booksIter != books->constEnd(); ++booksIter, ++row) {
+            localBooksTable->insertRow(row);
+            QTableWidgetItem *item0 = new QTableWidgetItem(*(*booksIter).name());
+            QTableWidgetItem *item1 = new QTableWidgetItem(*(*booksIter).author());
+            QTableWidgetItem *item2 = new QTableWidgetItem((*booksIter).addedAt()->toString());
+            localBooksTable->setItem(row,0,item0);
+            localBooksTable->setItem(row,1,item1);
+            localBooksTable->setItem(row,2,item2);
+        }
+
+    }
 }
 
 TestWindow::~TestWindow()

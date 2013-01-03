@@ -13,7 +13,7 @@
 //    GNU General Public License for more details.
 //
 //    You should have received a copy of the GNU General Public License
-//    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+//    along with FreeLib.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #ifndef TESTWINDOW_H
@@ -22,9 +22,11 @@
 #include <QMainWindow>
 #include <QtGui>
 #include <QtWidgets>
-#include "libconnector.h"
 
+namespace freeLib {
 class LibConnector;
+class Book;
+}
 
 namespace Ui {
 class TestWindow;
@@ -42,7 +44,7 @@ public slots:
 
     void buttonAddPressed();
 
-    void responseArrived(const QString& resp);
+    void responseArrived(const QString& resp, const QString& resp);
     
 public:
     void setUpInterface();
@@ -55,6 +57,8 @@ private:
     Ui::TestWindow *ui;
     freeLib::LibConnector *connector;
     QTextEdit *textEdit;
+    QTableWidget *localBooksTable;
+
 
     void setUpConnector();
 

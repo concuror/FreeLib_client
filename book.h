@@ -15,18 +15,60 @@
 //    You should have received a copy of the GNU General Public License
 //    along with FreeLib.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef BOOK_H
+#define BOOK_H
 
-#include "testwindow.h"
-#include <QApplication>
+#include <QObject>
 
-int main(int argc, char *argv[])
+namespace freeLib {
+
+class Book : public QObject
 {
-    QApplication a(argc, argv);
-    TestWindow w;
+    Q_OBJECT
 
-    w.setUpInterface();
+private:
 
-    w.show();
+    QString *_name;
 
-    return a.exec();
+    QString *_author;
+
+    int _id;
+
+    QDateTime *_added;
+
+    QString *_extension;
+
+public:
+
+    explicit Book(QObject *parent = 0);
+
+    explicit Book(const QVariantMap& data, QObject *parent = 0);
+
+    Book(const Book& other);
+
+    QString *name() const;
+
+    QString *author() const;
+
+    QString *extension() const;
+
+    const int id() const;
+
+    QDateTime *addedAt() const;
+
+    QString filename() const;
+
+    bool operator ==(const Book& right);
+
+    Book& operator =(const Book& right);
+
+    virtual ~Book();
+    
+signals:
+    
+public slots:
+    
+};
+
 }
+#endif // BOOK_H

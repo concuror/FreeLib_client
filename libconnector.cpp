@@ -13,10 +13,12 @@
 //    GNU General Public License for more details.
 //
 //    You should have received a copy of the GNU General Public License
-//    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+//    along with FreeLib.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #include "libconnector.h"
+#include "librarymanager.h"
+#include "book.h"
 
 using namespace freeLib;
 
@@ -25,6 +27,7 @@ LibConnector::LibConnector(QObject *parent) :
 {
     baseUrl = NULL;
     networkManager = NULL;
+    filename = NULL;
 }
 
 LibConnector::LibConnector (QString *BaseUrl, QObject *parent) :
@@ -32,22 +35,24 @@ LibConnector::LibConnector (QString *BaseUrl, QObject *parent) :
 {
     baseUrl = BaseUrl;
     networkManager = new QNetworkAccessManager(this);
+    filename = NULL;
     QObject::connect(networkManager,SIGNAL(finished(QNetworkReply*)),this,SLOT(requestFinishedWithReply(QNetworkReply*)));
 }
 
-void LibConnector::fetchFrom(QString *page) {
+void LibConnector::fetchFrom(const QString &page) {
     QUrl url;
-    url.setUrl(*baseUrl + *page);
-    qDebug() << url.toString();
+    url.setUrl(*baseUrl + page);
     QNetworkRequest request(url);
-    if (page->contains("books/list")) {
+    if (page.contains("books/list")) {
         networkManager->get(request);
     }
-    else if (page->contains("books/add")) {
-        QMap<QString,QVariant> map;
-        map.insert("author","Den Abnett");
-        map.insert("name","Chuma");
-        map.insert("extension",".mobi");
+    else if (page.contains("books/add")) {
+
+        request.setHeader(QNetworkRequest::ContentTypeHeader, "application/octet-stream");
+        request.setRawHeader("author","Den Abnett");
+        request.setRawHeader("name","Chuma");
+        request.setRawHeader("extension",".mobi");
+
         QFile book("/Users/concuror/Downloads/Abnett_Chuma_183366.mobi");
         if (!book.open(QIODevice::ReadOnly)) {
             qDebug() << book.errorString();
@@ -55,16 +60,17 @@ void LibConnector::fetchFrom(QString *page) {
         }
         QByteArray arr = book.readAll();
         book.close();
-        map.insert("book",arr.toBase64());
-        QVariant tmp(map);
-        QJsonDocument doc = QJsonDocument::fromVariant(tmp);
-        qDebug() << "Binary:" << doc.toJson();
-        networkManager->put(request,doc.toJson());
+
+        qDebug() << "Length:" << arr.length() << "Binary:" << arr;
+        request.setHeader(QNetworkRequest::ContentLengthHeader,arr.length());
+        networkManager->put(request,arr);
     }
-    else if (page->contains("books/get")) {
+    else if (page.contains("books/get")) {
         networkManager->get(request);
     }
-    delete page;
+    else if (page.contains("books/download")) {
+        networkManager->get(request);
+    }
 }
 
 void LibConnector::requestFinishedWithReply(QNetworkReply *reply) {
@@ -72,22 +78,27 @@ void LibConnector::requestFinishedWithReply(QNetworkReply *reply) {
         qDebug() << reply->errorString();
     }
     else {
+        LibraryManager *manager = LibraryManager::instance();
         QString path = reply->url().path();
         QJsonParseError *parseError = new QJsonParseError();
         QByteArray arr = reply->readAll();
         QString reply(arr);
         //qDebug() << arr;
-        emit replyArrived(reply);
         if (path.contains("books/list",Qt::CaseInsensitive)) {
             QJsonDocument doc = QJsonDocument::fromJson(arr,parseError);
             if (parseError->error > 0) {
                 qDebug() << parseError->errorString();
                 return;
             }
-            qDebug() << doc.toVariant();
+            QVariantList list = doc.toVariant().toList();
+            QVariantList::const_iterator bookIter;
+            for (bookIter = list.constBegin(); bookIter != list.constEnd(); ++bookIter) {
+                Book tmpBook((*bookIter).toMap());
+                manager->addBook(tmpBook);
+            }
         }
         else if (path.contains("books/add",Qt::CaseInsensitive)) {
-            qDebug() << arr;
+
         }
         else if (path.contains("books/get",Qt::CaseInsensitive)) {
             QJsonDocument doc = QJsonDocument::fromJson(arr,parseError);
@@ -98,22 +109,34 @@ void LibConnector::requestFinishedWithReply(QNetworkReply *reply) {
             QVariantMap map = doc.toVariant().toMap();
             qDebug() << map;
 
-            QString filename = map.value("author").toString();
-            filename.append(map.value("name").toString());
-            filename.append(map.value("extension").toString());
-            filename.prepend("/Users/concuror/Downloads/");
+            filename = new QString( map.value("author").toString() );
+            filename->append(map.value("name").toString());
+            filename->append(map.value("extension").toString());
+            filename->prepend("/Users/concuror/Downloads/");
 
-            QFile book(filename);
+            QString url("books/download/");
+            url.append(map.value("id").toString());
+
+            this->fetchFrom(url);
+
+        }
+        else if (path.contains("books/download",Qt::CaseInsensitive)) {
+            QFile book(*filename);
             if (!book.open(QIODevice::WriteOnly)) {
                 qDebug() << book.errorString();
-                return;
             }
-            book.write(map.value("book").toByteArray());
-            book.close();
+            else {
+                book.write(arr);
+                book.close();
+            }
+            delete filename;
+            filename = NULL;
         }
+        emit replyArrived(path,reply);
     }
 }
 
 LibConnector::~LibConnector() {
+    delete filename;
     delete baseUrl;
 }

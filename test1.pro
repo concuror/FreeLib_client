@@ -14,10 +14,14 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         testwindow.cpp \
-    libconnector.cpp
+    libconnector.cpp \
+    book.cpp \
+    librarymanager.cpp
 
 HEADERS  += testwindow.h \
-    libconnector.h
+    libconnector.h \
+    book.h \
+    librarymanager.h
 
 FORMS    += testwindow.ui
 

@@ -13,7 +13,7 @@
 //    GNU General Public License for more details.
 //
 //    You should have received a copy of the GNU General Public License
-//    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+//    along with FreeLib.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #ifndef LIBCONNECTOR_H
@@ -31,6 +31,8 @@ private:
 
     QString *baseUrl;
 
+    QString *filename;
+
     QNetworkAccessManager *networkManager;
 
 public:
@@ -38,13 +40,13 @@ public:
 
     explicit LibConnector(QString *baseUrl, QObject *parent = 0);
 
-    void fetchFrom(QString *page);
+    void fetchFrom(const QString& page);
 
     virtual ~LibConnector();
 
 signals:
 
-    void replyArrived(const QString& reply);
+    void replyArrived(const QString& path, const QString& reply);
 
 public slots:
 
