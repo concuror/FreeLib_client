@@ -109,10 +109,10 @@ void LibConnector::requestFinishedWithReply(QNetworkReply *reply) {
             QVariantMap map = doc.toVariant().toMap();
 
             QSet<Book> *books = LibraryManager::instance()->getBooks();
-            QSet<Book>::iterator booksIter;
+            QSet<Book>::const_iterator booksIter;
             Book tmp;
             int id = map.value("id").toInt();
-            for (booksIter = books->begin(); booksIter != books->end(); ++booksIter) {
+            for (booksIter = books->constBegin(); booksIter != books->constEnd(); ++booksIter) {
                 if ( (*booksIter).id() == id) {
                     tmp = *booksIter;
                     break;
