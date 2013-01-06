@@ -106,9 +106,9 @@ void TestWindow::buttonAddPressed() {
 }
 
 void TestWindow::refreshTable() {
-    QList<Book> *books = LibraryManager::instance()->getBooks();
+    QSet<Book> *books = LibraryManager::instance()->getBooks();
     int row = localBooksTable->rowCount();
-    QList<Book>::const_iterator booksIter;
+    QSet<Book>::const_iterator booksIter;
     for (booksIter = books->constBegin(); booksIter != books->constEnd(); ++booksIter, ++row) {
         localBooksTable->insertRow(row);
         QTableWidgetItem *item0 = new QTableWidgetItem(*(*booksIter).name());

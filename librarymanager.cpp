@@ -10,7 +10,7 @@ static LibraryManager* m_Instance;
 LibraryManager::LibraryManager(QObject *parent) :
     QObject(parent)
 {
-    localBooks = new QList<Book>;
+    localBooks = new QSet<Book>;
 }
 
 LibraryManager* LibraryManager::instance() {
@@ -37,31 +37,31 @@ void LibraryManager::drop()
     mutex.unlock();
 }
 
-QList<Book> *LibraryManager::getBooks(){
+QSet<Book> *LibraryManager::getBooks(){
     return localBooks;
 }
 
 void LibraryManager::addBook(const Book &book) {
-    if (!localBooks->contains(book))
-        localBooks->append(book);
+    localBooks->insert(book);
 }
 
 void LibraryManager::addBooks(const QList<Book> &books) {
-    QSet<Book> set = books.toSet();
-    set.intersect(localBooks->toSet());
-    localBooks->clear();
-    localBooks->append(set.toList());
+    localBooks->intersect(books.toSet());
+}
+
+void LibraryManager::addBooks(const QSet<Book> &books) {
+    localBooks->intersect(books);
 }
 
 void LibraryManager::removeBook(const Book& book) {
-    localBooks->removeOne(book);
+    localBooks->remove(book);
 }
 
 void LibraryManager::removeBook(const int id) {
-    QList<Book>::const_iterator stlIter;
+    QSet<Book>::const_iterator stlIter;
     for( stlIter = localBooks->begin(); stlIter != localBooks->end(); ++stlIter ) {
         if ((*stlIter).id() == id) {
-            localBooks->removeOne(*stlIter);
+            localBooks->remove(*stlIter);
             break;
         }
     }
