@@ -105,22 +105,32 @@ void TestWindow::buttonAddPressed() {
     connector->fetchFrom( "books/add" );
 }
 
+void TestWindow::refreshTable() {
+    QList<Book> *books = LibraryManager::instance()->getBooks();
+    int row = localBooksTable->rowCount();
+    QList<Book>::const_iterator booksIter;
+    for (booksIter = books->constBegin(); booksIter != books->constEnd(); ++booksIter, ++row) {
+        localBooksTable->insertRow(row);
+        QTableWidgetItem *item0 = new QTableWidgetItem(*(*booksIter).name());
+        QTableWidgetItem *item1 = new QTableWidgetItem(*(*booksIter).author());
+        QTableWidgetItem *item2 = new QTableWidgetItem((*booksIter).addedAt()->toString());
+        localBooksTable->setItem(row,0,item0);
+        localBooksTable->setItem(row,1,item1);
+        localBooksTable->setItem(row,2,item2);
+    }
+}
+
 void TestWindow::responseArrived(const QString& path, const QString &resp) {
     textEdit->setText(resp);
     if (path.contains("books/list")) {
-        QList<Book> *books = LibraryManager::instance()->getBooks();
-        int row = localBooksTable->rowCount();
-        QList<Book>::const_iterator booksIter;
-        for (booksIter = books->constBegin(); booksIter != books->constEnd(); ++booksIter, ++row) {
-            localBooksTable->insertRow(row);
-            QTableWidgetItem *item0 = new QTableWidgetItem(*(*booksIter).name());
-            QTableWidgetItem *item1 = new QTableWidgetItem(*(*booksIter).author());
-            QTableWidgetItem *item2 = new QTableWidgetItem((*booksIter).addedAt()->toString());
-            localBooksTable->setItem(row,0,item0);
-            localBooksTable->setItem(row,1,item1);
-            localBooksTable->setItem(row,2,item2);
-        }
-
+        for (int i=localBooksTable->rowCount()-1; i >= 0; --i)
+            localBooksTable->removeRow(i);
+        this->refreshTable();
+    }
+    else if (path.contains("books/get")) {
+        for (int i=localBooksTable->rowCount()-1; i >= 0; --i)
+            localBooksTable->removeRow(i);
+        this->refreshTable();
     }
 }
 

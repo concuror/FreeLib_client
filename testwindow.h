@@ -59,6 +59,7 @@ private:
     QTextEdit *textEdit;
     QTableWidget *localBooksTable;
 
+    void refreshTable();
 
     void setUpConnector();
 

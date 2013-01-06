@@ -19,6 +19,7 @@
 #define BOOK_H
 
 #include <QObject>
+#include <QtCore>
 
 namespace freeLib {
 
@@ -37,6 +38,8 @@ private:
     QDateTime *_added;
 
     QString *_extension;
+
+    void setInfoFrom(const QVariantMap& data);
 
 public:
 
@@ -58,7 +61,9 @@ public:
 
     QString filename() const;
 
-    bool operator ==(const Book& right);
+    int updateInfo(const QVariantMap& data);
+
+    bool operator ==(const Book& right) const;
 
     Book& operator =(const Book& right);
 
@@ -70,5 +75,9 @@ public slots:
     
 };
 
+}
+
+inline uint qHash(const freeLib::Book &key) {
+    return (qHash(key.id()) ^ qHash(*key.name()));
 }
 #endif // BOOK_H

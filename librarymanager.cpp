@@ -1,4 +1,5 @@
 #include <QMutex>
+#include <QSet>
 #include "librarymanager.h"
 #include "book.h"
 
@@ -41,11 +42,15 @@ QList<Book> *LibraryManager::getBooks(){
 }
 
 void LibraryManager::addBook(const Book &book) {
-    localBooks->append(book);
+    if (!localBooks->contains(book))
+        localBooks->append(book);
 }
 
 void LibraryManager::addBooks(const QList<Book> &books) {
-    localBooks->append(books);
+    QSet<Book> set = books.toSet();
+    set.intersect(localBooks->toSet());
+    localBooks->clear();
+    localBooks->append(set.toList());
 }
 
 void LibraryManager::removeBook(const Book& book) {

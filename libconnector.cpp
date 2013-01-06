@@ -107,7 +107,16 @@ void LibConnector::requestFinishedWithReply(QNetworkReply *reply) {
                 return;
             }
             QVariantMap map = doc.toVariant().toMap();
-            qDebug() << map;
+
+            QList<Book> *books = LibraryManager::instance()->getBooks();
+            QList<Book>::iterator booksIter;
+            int id = map.value("id").toInt();
+            for (booksIter = books->begin(); booksIter != books->end(); ++booksIter) {
+                if ( (*booksIter).id() == id) {
+                    (*booksIter).updateInfo(map);
+                    break;
+                }
+            }
 
             filename = new QString( map.value("author").toString() );
             filename->append(map.value("name").toString());

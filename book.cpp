@@ -51,6 +51,25 @@ Book::Book(const Book& other):
     *this = other;
 }
 
+void Book::setInfoFrom(const QVariantMap &data) {
+    delete _name;
+    delete _author;
+    delete _extension;
+    delete _added;
+    _name = new QString(data.value("name").toString());
+    _author = new QString(data.value("author").toString());
+    _extension = new QString(data.value("extension").toString());
+    _added = new QDateTime(data.value("added_at").toDateTime());
+}
+
+int Book::updateInfo(const QVariantMap &data) {
+    if (_id != data.value("id").toInt()) {
+        return -1;
+    }
+    this->setInfoFrom(data);
+    return 0;
+}
+
 QString *Book::name() const {
     return _name;
 }
@@ -80,7 +99,7 @@ QString Book::filename() const {
     return filename;
 }
 
-bool Book::operator ==(const Book& right) {
+bool Book::operator ==(const Book& right) const {
     return right.id() == _id;
 }
 

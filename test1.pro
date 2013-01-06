@@ -8,7 +8,7 @@ QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = test1
+TARGET = freeLib
 TEMPLATE = app
 
 
@@ -24,8 +24,6 @@ HEADERS  += testwindow.h \
     librarymanager.h
 
 FORMS    += testwindow.ui
-
-LIBS += -ljson
 
 OTHER_FILES += \
     README.md \
