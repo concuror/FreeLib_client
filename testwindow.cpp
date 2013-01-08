@@ -18,7 +18,6 @@
 
 #include "testwindow.h"
 #include "book.h"
-#include "ui_testwindow.h"
 #include "libconnector.h"
 #include "librarymanager.h"
 #include "book.h"
@@ -26,10 +25,9 @@
 using namespace freeLib;
 
 TestWindow::TestWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::TestWindow)
+    QMainWindow(parent)
 {
-    ui->setupUi(this);
+    this->setCentralWidget(new QWidget);
     connector = NULL;
 }
 
@@ -136,5 +134,5 @@ void TestWindow::responseArrived(const QString& path, const QString &resp) {
 
 TestWindow::~TestWindow()
 {
-    delete ui;
+
 }

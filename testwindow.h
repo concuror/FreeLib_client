@@ -28,10 +28,6 @@ class LibConnector;
 class Book;
 }
 
-namespace Ui {
-class TestWindow;
-}
-
 class TestWindow : public QMainWindow
 {
     Q_OBJECT
@@ -54,7 +50,6 @@ public:
     
 private:
 
-    Ui::TestWindow *ui;
     freeLib::LibConnector *connector;
     QTextEdit *textEdit;
     QTableWidget *localBooksTable;

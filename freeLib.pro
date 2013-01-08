@@ -23,7 +23,7 @@ HEADERS  += testwindow.h \
     book.h \
     librarymanager.h
 
-FORMS    += testwindow.ui
+FORMS    +=
 
 OTHER_FILES += \
     README.md \
