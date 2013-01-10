@@ -42,6 +42,8 @@ public:
 
     void fetchFrom(const QString& page);
 
+    void sendData(const QString &page, const QByteArray &info, const QVariantMap &params);
+
     virtual ~LibConnector();
 
 signals:

@@ -46,30 +46,30 @@ void LibConnector::fetchFrom(const QString &page) {
     if (page.contains("books/list")) {
         networkManager->get(request);
     }
-    else if (page.contains("books/add")) {
-
-        request.setHeader(QNetworkRequest::ContentTypeHeader, "application/octet-stream");
-        request.setRawHeader("author","Den Abnett");
-        request.setRawHeader("name","Chuma");
-        request.setRawHeader("extension",".mobi");
-
-        QFile book("/Users/concuror/Downloads/Abnett_Chuma_183366.mobi");
-        if (!book.open(QIODevice::ReadOnly)) {
-            qDebug() << book.errorString();
-            return;
-        }
-        QByteArray arr = book.readAll();
-        book.close();
-
-        qDebug() << "Length:" << arr.length() << "Binary:" << arr;
-        request.setHeader(QNetworkRequest::ContentLengthHeader,arr.length());
-        networkManager->put(request,arr);
-    }
     else if (page.contains("books/get")) {
         networkManager->get(request);
     }
     else if (page.contains("books/download")) {
         networkManager->get(request);
+    }
+}
+
+void LibConnector::sendData(const QString &page, const QByteArray &info, const QVariantMap &params) {
+    QUrl url;
+    url.setUrl(*baseUrl + page);
+    QNetworkRequest request(url);
+    if (page.contains("books/add")) {
+
+        qDebug() << params;
+
+        request.setHeader(QNetworkRequest::ContentTypeHeader, "application/octet-stream");
+        request.setRawHeader("author",params["author"].toByteArray());
+        request.setRawHeader("name",params["name"].toByteArray());
+        request.setRawHeader("extension",params["extension"].toByteArray());
+
+        request.setHeader(QNetworkRequest::ContentLengthHeader,info.length());
+        networkManager->put(request,info);
+
     }
 }
 

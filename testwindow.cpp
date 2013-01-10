@@ -100,7 +100,27 @@ void TestWindow::buttonAddPressed() {
     if (connector == NULL) {
         this->setUpConnector();
     }
-    connector->fetchFrom( "books/add" );
+    QString path = QFileDialog::getOpenFileName(this,
+                                                "Choose a book");
+    QString ext = path.split('.')[path.split('.').length() - 1];
+    if (NULL == path) {
+        return;
+    }
+    qDebug() << ext;
+    QFile book( path );
+    if (!book.open(QIODevice::ReadOnly)) {
+        qDebug() << book.errorString();
+        return;
+    }
+    QByteArray arr = book.readAll();
+    book.close();
+
+    QVariantMap map;
+    map.insert("author", "Andrii");
+    map.insert("name","Monkey");
+    map.insert("extension",ext);
+
+    connector->sendData("books/add", arr, map);
 }
 
 void TestWindow::refreshTable() {
