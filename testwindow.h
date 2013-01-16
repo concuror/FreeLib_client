@@ -40,7 +40,7 @@ public slots:
 
     void buttonAddPressed();
 
-    void responseArrived(const QString& resp, const QString& resp);
+    void responseArrived(const QString& path, const QString& resp);
     
 public:
     void setUpInterface();

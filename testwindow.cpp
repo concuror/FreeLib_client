@@ -36,11 +36,12 @@ void TestWindow::setUpInterface() {
     textEdit = new QTextEdit();
     textEdit->setReadOnly(true);
 
-    localBooksTable = new QTableWidget(0, 3);
+    localBooksTable = new QTableWidget(0, 4);
 
     QStringList headers;
-    headers << "name" << "author" << "added";
+    headers << "name" << "author" << "added" << "id";
     localBooksTable->setHorizontalHeaderLabels(headers);
+    localBooksTable->setColumnHidden(3, true);
 
     QPushButton *quitButton = new QPushButton("&Quit");
 
@@ -93,7 +94,16 @@ void TestWindow::buttonGetPressed() {
     if (connector == NULL) {
         this->setUpConnector();
     }
-    connector->fetchFrom( "books/get/1" );
+    QList<QTableWidgetItem> selectedItems = localBooksTable->selectedItems();
+    if (selectedItems.count() < 1) {
+        QDebug << "None selected";
+        return;
+    }
+    int selectedRow = selectedItems.at(0)->row();
+    QString address("books/get/");
+    QTableWidgetItem *item = localBooksTable->item(selectedRow,3);
+    address.append(item->text());
+    connector->fetchFrom( address );
 }
 
 void TestWindow::buttonAddPressed() {
@@ -132,9 +142,11 @@ void TestWindow::refreshTable() {
         QTableWidgetItem *item0 = new QTableWidgetItem(*(*booksIter).name());
         QTableWidgetItem *item1 = new QTableWidgetItem(*(*booksIter).author());
         QTableWidgetItem *item2 = new QTableWidgetItem((*booksIter).addedAt()->toString());
+        QTableWidgetItem *item3 = new QTableWidgetItem( QString::number( (*booksIter).id() ) );
         localBooksTable->setItem(row,0,item0);
         localBooksTable->setItem(row,1,item1);
         localBooksTable->setItem(row,2,item2);
+        localBooksTable->setItem(row,3,item3);
     }
 }
 
