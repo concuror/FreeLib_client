@@ -41,6 +41,8 @@ private:
 
     void setInfoFrom(const QVariantMap& data);
 
+    void clearData();
+
 public:
 
     explicit Book(QObject *parent = 0);

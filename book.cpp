@@ -51,11 +51,15 @@ Book::Book(const Book& other):
     *this = other;
 }
 
-void Book::setInfoFrom(const QVariantMap &data) {
+void Book::clearData() {
     delete _name;
     delete _author;
     delete _extension;
     delete _added;
+}
+
+void Book::setInfoFrom(const QVariantMap &data) {
+    clearData();
     _name = new QString(data.value("name").toString());
     _author = new QString(data.value("author").toString());
     _extension = new QString(data.value("extension").toString());
@@ -105,10 +109,7 @@ bool Book::operator ==(const Book& right) const {
 
 Book &Book::operator =(const Book& right) {
     if (this != &right) {
-        delete _name;
-        delete _author;
-        delete _extension;
-        delete _added;
+        clearData();
         _name = new QString(*right.name());
         _author = new QString(*right.author());
         _extension = new QString(*right.extension());
@@ -119,8 +120,5 @@ Book &Book::operator =(const Book& right) {
 }
 
 Book::~Book() {
-    delete _name;
-    delete _author;
-    delete _extension;
-    delete _added;
+    clearData();
 }
