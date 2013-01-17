@@ -112,10 +112,10 @@ void TestWindow::buttonAddPressed() {
     }
     QString path = QFileDialog::getOpenFileName(this,
                                                 "Choose a book");
-    QString ext = path.split('.')[path.split('.').length() - 1];
     if (NULL == path) {
         return;
     }
+    QString ext = path.split('.')[path.split('.').length() - 1];
     qDebug() << ext;
     QFile book( path );
     if (!book.open(QIODevice::ReadOnly)) {
