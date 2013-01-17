@@ -94,9 +94,9 @@ void TestWindow::buttonGetPressed() {
     if (connector == NULL) {
         this->setUpConnector();
     }
-    QList<QTableWidgetItem> selectedItems = localBooksTable->selectedItems();
+    QList<QTableWidgetItem *> selectedItems = localBooksTable->selectedItems();
     if (selectedItems.count() < 1) {
-        QDebug << "None selected";
+        qDebug() << "None selected";
         return;
     }
     int selectedRow = selectedItems.at(0)->row();
