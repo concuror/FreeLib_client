@@ -45,6 +45,8 @@ private:
 
 public:
 
+    QString *path;
+
     explicit Book(QObject *parent = 0);
 
     explicit Book(const QVariantMap& data, QObject *parent = 0);

@@ -162,9 +162,11 @@ void TestWindow::responseArrived(const QString& path, const QString &resp) {
             localBooksTable->removeRow(i);
         this->refreshTable();
     }
+    else if (path.contains("books/download")) {
+        QString path = QFileDialog::getExistingDirectory(this,"choose directory");
+    }
 }
 
-TestWindow::~TestWindow()
-{
+TestWindow::~TestWindow() {
 
 }

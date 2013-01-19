@@ -123,15 +123,12 @@ void LibConnector::requestFinishedWithReply(QNetworkReply *reply) {
             books->insert(tmp);
         }
 
-        filename = new QString( map.value("author").toString() );
-        filename->append(map.value("name").toString());
-        filename->append(map.value("extension").toString());
-        filename->prepend("/Users/concuror/Downloads/");
+        filename = new QString( tmp.filename() );
 
-        QString url("books/download/");
-        url.append(map.value("id").toString());
+//        QString url("books/download/");
+//        url.append(map.value("id").toString());
 
-        this->fetchFrom(url);
+//        this->fetchFrom(url);
 
     }
     else if (path.contains("books/download",Qt::CaseInsensitive)) {
