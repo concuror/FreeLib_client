@@ -19,6 +19,7 @@
 #include "libconnector.h"
 #include "librarymanager.h"
 #include "book.h"
+#include "jsonabstraction.h"
 
 using namespace freeLib;
 
@@ -80,17 +81,15 @@ void LibConnector::requestFinishedWithReply(QNetworkReply *reply) {
     }
     LibraryManager *manager = LibraryManager::instance();
     QString path = reply->url().path();
-    QJsonParseError *parseError = new QJsonParseError();
+    bool parseSuccess;
     QByteArray arr = reply->readAll();
     QString data(arr);
-    //qDebug() << arr;
     if (path.contains("books/list",Qt::CaseInsensitive)) {
-        QJsonDocument doc = QJsonDocument::fromJson(arr,parseError);
-        if (parseError->error > 0) {
-            qDebug() << parseError->errorString();
+        QVariant json = JSONAbstraction::parse(data, parseSuccess);
+        if (!parseSuccess) {
             return;
         }
-        QVariantList list = doc.toVariant().toList();
+        QVariantList list = json.toList();
         QVariantList::const_iterator bookIter;
         for (bookIter = list.constBegin(); bookIter != list.constEnd(); ++bookIter) {
             Book tmpBook((*bookIter).toMap());
@@ -101,12 +100,11 @@ void LibConnector::requestFinishedWithReply(QNetworkReply *reply) {
 
     }
     else if (path.contains("books/get",Qt::CaseInsensitive)) {
-        QJsonDocument doc = QJsonDocument::fromJson(arr,parseError);
-        if (parseError->error > 0) {
-            qDebug() << parseError->errorString();
+        QVariant json = JSONAbstraction::parse(data, parseSuccess);
+        if (!parseSuccess) {
             return;
         }
-        QVariantMap map = doc.toVariant().toMap();
+        QVariantMap map = json.toMap();
 
         QSet<Book> *books = LibraryManager::instance()->getBooks();
         QSet<Book>::const_iterator booksIter;

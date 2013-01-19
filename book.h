@@ -57,7 +57,7 @@ public:
 
     QString *extension() const;
 
-    const int id() const;
+    int id() const;
 
     QDateTime *addedAt() const;
 

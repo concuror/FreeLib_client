@@ -86,7 +86,7 @@ QString *Book::extension() const {
     return _extension;
 }
 
-const int Book::id() const {
+int Book::id() const {
     return _id;
 }
 
