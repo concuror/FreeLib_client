@@ -9,12 +9,12 @@ JSONAbstraction::JSONAbstraction() {
 QVariant JSONAbstraction::parse(const QString &json, bool &success) {
 #if QT_VERSION >= 0x050000
     QJsonParseError *parseError = new QJsonParseError();
-    QByteArray arr(json);
+    QByteArray arr(json.toLatin1());
     QJsonDocument doc = QJsonDocument::fromJson(arr, parseError);
     if (parseError->error > 0) {
         success = false;
         qDebug() << parseError->errorString();
-        return;
+        return QVariant::QVariant();
     }
     success = true;
     return doc.toVariant();
