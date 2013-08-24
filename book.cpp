@@ -39,6 +39,7 @@ Book::Book(const QVariantMap& data, QObject *parent):
     _extension = new QString(data.value("extension").toString());
     _id = data.value("id").toInt();
     _added = new QDateTime(data.value("added_at").toDateTime());
+    _path = NULL;
 }
 
 Book::Book(const Book& other):
