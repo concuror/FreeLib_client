@@ -27,7 +27,7 @@ Book::Book(QObject *parent) :
     _author = NULL;
     _extension = NULL;
     _added = NULL;
-    path = NULL;
+    _path = NULL;
     _id = 0;
 }
 
@@ -48,7 +48,7 @@ Book::Book(const Book& other):
     _author = NULL;
     _extension = NULL;
     _added = NULL;
-    path = NULL;
+    _path = NULL;
     _id = 0;
     *this = other;
 }
@@ -58,7 +58,7 @@ void Book::clearData() {
     delete _author;
     delete _extension;
     delete _added;
-    delete path;
+    delete _path;
 }
 
 void Book::setInfoFrom(const QVariantMap &data) {
@@ -87,6 +87,10 @@ QString *Book::author() const {
 
 QString *Book::extension() const {
     return _extension;
+}
+
+QString *Book::path() const {
+    return _path;
 }
 
 int Book::id() const {
@@ -118,7 +122,11 @@ Book &Book::operator =(const Book& right) {
         _extension = new QString(*right.extension());
         _id = right.id();
         _added = new QDateTime(*right.addedAt());
-        path = new QString(*right.path);
+        if (right.path() != NULL) {
+            _path = new QString(*right.path());
+        } else {
+            _path = NULL;
+        }
     }
     return *this;
 }

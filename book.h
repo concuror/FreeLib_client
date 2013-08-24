@@ -39,13 +39,13 @@ private:
 
     QString *_extension;
 
+    QString *_path;
+
     void setInfoFrom(const QVariantMap& data);
 
     void clearData();
 
 public:
-
-    QString *path;
 
     explicit Book(QObject *parent = 0);
 
@@ -58,6 +58,8 @@ public:
     QString *author() const;
 
     QString *extension() const;
+
+    QString *path() const;
 
     int id() const;
 
